@@ -6,14 +6,7 @@ A small executable bash-script to deploy your flask application fast (mainly int
 
 1. Upload your flask application to your uberspace server
 2. Upload the deploy_flask.sh to your uberspace server and make it executable
-3. In the terminal install the flask and flup6 with the commands:
-
-```
-pip3 install flask --user
-pip3 install flup6 --user
-```
-
-4. Execute deploy_flask.sh and follow the instructions
+3. Execute deploy_flask.sh and follow the instructions
 
 ```
 ./deploy_flask.sh
@@ -24,11 +17,16 @@ You can reach your flask application in the path /fcgi-bin/your_application_name
 ## ToDos
 
 - Implement rewrite rules for a more beautiful URL
-- Don't exit the script after every false input - ask again for
+- Call the script with paramters
 - Test on Uberspace V7
-- Clean the code
 
+## Hints
 
+If you get an error like "/bin/bash^M: bad interpreter", execute the following command:
+
+```
+sed -i -e 's/\r$//' deploy_flask.sh
+```
 
 ## License
 

@@ -1,55 +1,61 @@
 #!/bin/bash
 
-echo "Your Uberspace username?"
-read UBERSPACE_NAME
+check_and_install_dependencies() {
+        FOUND_FLASK=$(pip3 list | grep -c -w 'Flask')
+        FOUND_FLUP=$(pip3 list | grep -c -w 'flup6')
 
-if [ -z UBERSPACE_NAME ]; then
-        echo "Uberspace name must not be empty."
-        exit
-fi
+        if [[ FOUND_FLASK -eq 1 ]]; then
+                echo "Found Flask: $(pip3 list | grep -w 'Flask')"
 
-echo "Location of your Flask application? (Type in full location path e.g. /home/username/flaskapplication)"
-read FLASK_LOCATION
+        else
+                pip3 install flask --user
+        fi
 
-if [ -z FLASK_LOCATION ]; then
-        echo "Location of Flask application must not be empty."
-        exit
-fi
+        if [[ FOUND_FLUP -eq 1 ]]; then
+                echo "Found flup6: $(pip3 list | grep -w 'flup6')"
+        else
+                pip3 install flup6 --user
+        fi
+}
 
-echo "Name of the file where your entry point of the application is (without .py)?"
-read FLASK_MODULE
+set_var() {
+        echo -e $1 #question
+        while read ASKING; do
+                if [[ -z "$ASKING" ]]; then
+                        echo -e $2 # error message
+                else
+                        eval $3=$ASKING # store in variable
+                        break
+                fi
+        done
+}
 
-if [ -z FLASK_MODULE ]; then
-        echo "MODULE of Flask application must not be empty."
-        exit
-fi
+check_and_install_dependencies
 
-echo "Name of your Flask application?"
-read FLASK_NAME
+# uberspace username
+set_var "Your Uberspace username?" "Uberspace name must not be empty." UBERSPACE_NAME
+# location of flask application
+set_var "Location of your Flask application?\n(Type in full location path e.g. /home/username/flaskapplication)\nHint: To find out the location type the 'pwd' command in your application folder." "Location of Flask application must not be empty." FLASK_LOCATION
+# name of flask module
+set_var "Name of the file where your entry point of the application is (without .py)?" "MODULE of Flask application must not be empty." FLASK_MODULE
+# name of flask application
+set_var "Name of your Flask application?" "Location of Flask application must not be empty." FLASK_NAME
+# identifier of application
+set_var "Identifier of your application? (e.g. if https://www.site.de/api you need to write 'api')" "The identifier must not be empty." API_URL
 
-if [ -z FLASK_NAME ]; then
-        echo "Location of Flask application must not be empty."
-        exit
-fi
-
-echo "Identifier of your application? (e.g. if https://www.site.de/api you need to write 'api')"
-read API_URL
-
-if [ -z API_URL ]; then
-        echo "The."
-        exit
-fi
-
+# create the fcgi script
 cd /home/$UBERSPACE_NAME/fcgi-bin
 
-if [ -e $API_URL.fcgi ]; then
-        echo "The API-URL already exists. Please check the corresponding $API_URL.fcgi file in your /fcgi-bin folder"
+SCRIPT_NAME=$API_URL.fcgi
+
+if [[ -e SCRIPT_NAME ]]; then
+        echo "The API-URL already exists. Please check the corresponding file ($SCRIPT_NAME) in your /fcgi-bin folder"
         exit
 fi
 
-touch $API_URL.fcgi
+touch $SCRIPT_NAME
 
-/bin/cat <<EOM >$API_URL.fcgi
+/bin/cat <<EOM >$SCRIPT_NAME
 #!/usr/bin/env python3
 import sys
 
@@ -60,7 +66,7 @@ from flup.server.fcgi_fork import WSGIServer
 WSGIServer($FLASK_NAME).run()
 EOM
 
-chmod +x $API_URL.fcgi
+chmod +x $SCRIPT_NAME
 
-echo "Well done! You can reach your flask application under domain.com/fcgi-bin/$API_URL.fcgi"
+echo "Well done! You can reach your flask application under domain.com/fcgi-bin/$SCRIPT_NAME"
 exit 0
