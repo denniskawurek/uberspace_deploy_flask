@@ -1,6 +1,6 @@
 # Deploy flask to uberspace
 
-A small executable bash-script to deploy your flask application fast (mainly intendet for APIs).
+A small executable bash-script to deploy your flask application fast (mainly intended for APIs).
 
 ## How to use
 
