@@ -63,4 +63,4 @@ EOM
 chmod +x $API_URL.fcgi
 
 echo "Well done! You can reach your flask application under domain.com/fcgi-bin/$API_URL.fcgi"
-exit 1
+exit 0
