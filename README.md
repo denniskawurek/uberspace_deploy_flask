@@ -21,7 +21,6 @@ As stated from the Uberspace team there is no FCGI support on Uberspace 7, yet a
 ## ToDos
 
 - Implement rewrite rules for a more beautiful URL
-- Call the script with paramters
 
 ## Hints
 
