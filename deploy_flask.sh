@@ -1,6 +1,7 @@
 #!/bin/bash
 
 check_and_install_dependencies() {
+        echo "Checking if dependencies (flask & flup6) are installed."
         FOUND_FLASK=$(pip3 list | grep -c -w 'Flask')
         FOUND_FLUP=$(pip3 list | grep -c -w 'flup6')
 
@@ -46,14 +47,24 @@ set_var "Identifier of your application? (e.g. if https://www.site.de/api you ne
 # create the fcgi script
 cd /home/$UBERSPACE_NAME/fcgi-bin
 
+if [[ $? -eq 1 ]]; then
+        echo -e "Error: Couldn't reach the fcgi path.\nIs your uberspace name right?\nAre you running on an Uberspace 6?"
+        exit 1
+fi
+
 SCRIPT_NAME=$API_URL.fcgi
 
 if [[ -e SCRIPT_NAME ]]; then
-        echo "The API-URL already exists. Please check the corresponding file ($SCRIPT_NAME) in your /fcgi-bin folder"
+        echo "Error: The API-URL already exists. Please check the corresponding file ($SCRIPT_NAME) in your /fcgi-bin folder"
         exit
 fi
 
 touch $SCRIPT_NAME
+
+if [[ $? -eq 1 ]]; then
+        echo "Error: Couldn't create fcgi-script."
+        exit 1
+fi
 
 /bin/cat <<EOM >$SCRIPT_NAME
 #!/usr/bin/env python3
@@ -67,6 +78,11 @@ WSGIServer($FLASK_NAME).run()
 EOM
 
 chmod +x $SCRIPT_NAME
+
+if [[ $? -eq 1 ]]; then
+        echo "Error: Couldn't set execution permissions for fcgi-script."
+        exit 1
+fi
 
 echo "Well done! You can reach your flask application under domain.com/fcgi-bin/$SCRIPT_NAME"
 exit 0
