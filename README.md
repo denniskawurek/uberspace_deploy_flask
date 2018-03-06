@@ -14,11 +14,14 @@ A small executable bash-script to deploy your flask application fast (mainly int
 
 You can reach your flask application in the path /fcgi-bin/your_application_name.fcgi
 
+## Uberspace 7
+
+As stated from the Uberspace team there is no FCGI support on Uberspace 7, yet and it is not clear if it will be in future.
+
 ## ToDos
 
 - Implement rewrite rules for a more beautiful URL
 - Call the script with paramters
-- Test on Uberspace V7
 
 ## Hints
 
