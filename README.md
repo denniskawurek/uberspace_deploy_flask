@@ -2,6 +2,13 @@
 
 A small executable bash-script to deploy your flask application fast (mainly intended for APIs).
 
+## Features
+
+* Checks if dependencies (Flask and flup6) are installed
+* Rewrites your URL for a pretty access
+* Rewrites your URL for HTTPS
+* Interactive mode and access via arguments
+
 ## How to use
 
 1. Upload your flask application to your uberspace server
