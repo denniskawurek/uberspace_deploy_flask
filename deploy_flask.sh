@@ -46,7 +46,7 @@ interactive_mode() {
 
 create_script() {
         # create the fcgi script
-        cd /home/$UBERSPACE_NAME/fcgi-bin
+        cd ~/fcgi-bin
 
         if [[ $? -eq 1 ]]; then
                 echo -e "Error: Couldn't reach the fcgi path.\nIs your uberspace name right?\nAre you running on an Uberspace 6?"
@@ -69,13 +69,25 @@ create_script() {
 
 /bin/cat <<EOM >$SCRIPT_NAME
 #!/usr/bin/env python3
-import sys
 
+import sys
 sys.path.insert(0, "$FLASK_LOCATION")
-from $FLASK_MODULE import $FLASK_NAME
 
 from flup.server.fcgi_fork import WSGIServer
-WSGIServer($FLASK_NAME).run()
+from $FLASK_MODULE import $FLASK_NAME
+
+class ScriptNameStripper(object):
+   def __init__(self, app):
+       self.app = app
+
+   def __call__(self, environ, start_response):
+       environ['SCRIPT_NAME'] = ''
+       return self.app(environ, start_response)
+
+app = ScriptNameStripper($FLASK_NAME)
+
+if __name__ == '__main__':
+    WSGIServer($FLASK_NAME).run()
 EOM
 
         chmod +x $SCRIPT_NAME
@@ -85,7 +97,38 @@ EOM
                 exit 1
         fi
 
-        echo "Well done! You can reach your flask application under domain.com/fcgi-bin/$SCRIPT_NAME"
+# Rewrite URL
+        mkdir ~/html/$API_URL
+
+        if [[ $? -eq 1 ]]; then
+                echo "Error: Couldn't create API folder. Check if there is a folder named '$API_URL' in ~/html"
+        fi
+
+        touch ~/html/$API_URL/.htaccess
+/bin/cat <<EOM >>~/html/$API_URL/.htaccess
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteCond %{ENV:HTTPS} !=on
+RewriteRule .* https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
+
+<IfModule mod_fcgid.c>
+   AddHandler fcgid-script .fcgi
+   <Files ~ (\.fcgi)>
+       SetHandler fcgid-script
+       Options +SymLinksIfOwnerMatch +ExecCGI
+   </Files>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+   Options +SymLinksIfOwnerMatch
+   RewriteEngine On
+   RewriteBase /$API_URL/
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteRule ^(.*)$ /fcgi-bin/$API_URL.fcgi/\$1 [QSA,L]
+</IfModule>
+EOM
+
+        echo "Well done! You can reach your flask application under https://www.domain.com/$API_URL"
         exit 0
 }
 
