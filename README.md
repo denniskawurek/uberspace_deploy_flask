@@ -1,13 +1,15 @@
 # Deploy flask to uberspace
 
-A small executable bash-script to deploy your flask application fast (mainly intended for APIs).
+[Deutsche Version hier.](README_GER.md)
+
+A small bash-script to deploy your flask application fast on your uberspace (mainly intended for APIs).
 
 ## Features
 
 * Checks if dependencies (Flask and flup6) are installed
 * Rewrites your URL for a pretty access
 * Rewrites your URL for HTTPS
-* Interactive mode and access via arguments
+* Interactive mode and execution via arguments
 
 ## How to use
 
@@ -24,7 +26,7 @@ Alternatively you can call the script with arguments for a faster execution (tak
 ```
 ./deploy_flask UBERSPACE_NAME FLASK_LOCATION FLASK_MODULE_NAME FLASK_APP_NAME API_URL
 UBERSPACE_NAME          Your uberspace username
-FLASK_LOCATION          The location of your flask application
+FLASK_LOCATION          The location of your flask application (full path)
 FLASK_MODULE_NAME       Name of your flask main module (without .py)
 FLASK_APP_NAME          Name of your flask application
 API_NAME                The name part of the URL where your APP shall be executable.
