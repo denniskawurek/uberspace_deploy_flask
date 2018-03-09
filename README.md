@@ -44,6 +44,9 @@ If you get an error like "/bin/bash^M: bad interpreter", execute the following c
 sed -i -e 's/\r$//' deploy_flask.sh
 ```
 
+## Sources
+[Official Flask documentation](http://flask.pocoo.org/docs/0.10/deploying/fastcgi/)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
